@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import styles from "./AddUser.module.css";
 import Button from "../UI/Button/Button";
+import Card from "../UI/Card/Card";
 
 const AddUser = ({ onAddUsers }) => {
   const [username, setUsername] = useState("");
@@ -15,6 +16,7 @@ const AddUser = ({ onAddUsers }) => {
       return;
     }
     onAddUsers({
+      id: Math.random().toString(),
       username: username,
       age: age,
     });
@@ -31,29 +33,22 @@ const AddUser = ({ onAddUsers }) => {
   };
 
   return (
-    <div className={styles["add-user"]}>
-      <form className={styles["add-user-form"]} onSubmit={addUserHandler}>
-        <div className={styles.username}>
-          <label htmlFor="username">Username</label>
-          <input
-            id="username"
-            type="text"
-            onChange={usernameChangeHandler}
-            value={username}
-          />
+    <Card className={styles["add-user"]}>
+      <form onSubmit={addUserHandler}>
+        <label htmlFor="username">Username</label>
+        <input
+          id="username"
+          type="text"
+          onChange={usernameChangeHandler}
+          value={username}
+        />
+        <label htmlFor="age">Age (Years)</label>
+        <input id="age" type="number" onChange={ageChangeHandler} value={age} />
+        <div className={styles["button-container"]}>
+          <Button type="submit">Add User</Button>
         </div>
-        <div className={styles.age}>
-          <label htmlFor="age">Age (Years)</label>
-          <input
-            id="age"
-            type="number"
-            onChange={ageChangeHandler}
-            value={age}
-          />
-        </div>
-        <Button type="submit">Add User</Button>
       </form>
-    </div>
+    </Card>
   );
 };
 
