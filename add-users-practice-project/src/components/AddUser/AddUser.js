@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, Fragment } from "react";
 import styles from "./AddUser.module.css";
 import Button from "../UI/Button/Button";
 import Card from "../UI/Card/Card";
@@ -47,8 +47,14 @@ const AddUser = ({ onAddUsers }) => {
   };
 
   return (
-    <div>
-      {error && <ErrorModal title={error.title} message={error.message} onConfirm={errorHandler} />}
+    <Fragment>
+      {error && (
+        <ErrorModal
+          title={error.title}
+          message={error.message}
+          onConfirm={errorHandler}
+        />
+      )}
       <Card className={styles["add-user"]}>
         <form onSubmit={addUserHandler}>
           <label htmlFor="username">Username</label>
@@ -70,7 +76,7 @@ const AddUser = ({ onAddUsers }) => {
           </div>
         </form>
       </Card>
-    </div>
+    </Fragment>
   );
 };
 
