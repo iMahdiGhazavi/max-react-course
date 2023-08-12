@@ -7,29 +7,23 @@ const useHttp = () => {
   const sendRequest = useCallback(async (requestConfig, applyData) => {
     setIsLoading(true);
     setError(null);
-    try {
-      const response = await fetch(requestConfig.url, {
-        method: requestConfig.method ? requestConfig.method : "GET",
-        headers: requestConfig.header ? requestConfig.header : {},
-        body: JSON.stringify(requestConfig.body)
-          ? JSON.stringify(requestConfig.body)
-          : null,
-      });
+    const response = await fetch(requestConfig.url, {
+      method: requestConfig.method ? requestConfig.method : "GET",
+      headers: requestConfig.header ? requestConfig.header : {},
+      body: JSON.stringify(requestConfig.body)
+        ? JSON.stringify(requestConfig.body)
+        : null,
+    });
 
-      if (!response.ok) {
-        throw new Error("Request failed!");
-      }
-      const responseData = await response.json();
-
-      applyData(responseData);
-    } catch (err) {
-      setError(err.message || "Something went wrong!");
-      throw err;
+    if (!response.ok) {
+      throw new Error("Request failed!");
     }
-    setIsLoading(false);
+    const responseData = await response.json();
+
+    applyData(responseData);
   }, []);
 
-  return { isLoading, error, sendRequest };
+  return { isLoading, setIsLoading, error, setError, sendRequest };
 };
 
 export default useHttp;
