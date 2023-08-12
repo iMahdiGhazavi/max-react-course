@@ -7,7 +7,13 @@ import useHttp from "../../hooks/use-http";
 const AvailableMeals = () => {
   const [meals, setMeals] = useState([]);
 
-  const { isLoading, error, sendRequest: fetchMeals } = useHttp();
+  const {
+    isLoading,
+    setIsLoading,
+    error,
+    setError,
+    sendRequest: fetchMeals,
+  } = useHttp();
 
   useEffect(() => {
     const transformMeals = (mealsObj) => {
@@ -21,12 +27,32 @@ const AvailableMeals = () => {
         });
       }
       setMeals(loadedMeals);
+      setIsLoading(false);
     };
     const requestConfig = {
       url: "https://react-http-f6bc6-default-rtdb.asia-southeast1.firebasedatabase.app/meals.json",
     };
-    fetchMeals(requestConfig, transformMeals);
+    fetchMeals(requestConfig, transformMeals).catch((error) => {
+      setIsLoading(false);
+      setError(error.message);
+    });
   }, []);
+
+  if (isLoading) {
+    return (
+      <section className={classes["meals-loading"]}>
+        <p>Loading...</p>
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section className={classes["meals-error"]}>
+        <p>{error}</p>
+      </section>
+    );
+  }
 
   const mealsList = meals.map((meal) => (
     <MealItem
