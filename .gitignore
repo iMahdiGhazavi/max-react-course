@@ -5,6 +5,8 @@
 /.pnp
 .pnp.js
 /.next
+/.next/cache/webpack/client-development
+.next
 
 # testing
 /coverage
