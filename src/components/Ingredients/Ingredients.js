@@ -1,23 +1,50 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 import IngredientForm from "./IngredientForm";
 import IngredientList from "./IngredientList";
 import Search from "./Search";
 
-const INITIAL_INGREDIENTS = [
-  { id: "1", title: "Apples", amount: 5 },
-  { id: "2", title: "Tomatoes", amount: 3 },
-  { id: "3", title: "Potatoes", amount: 6 },
-];
-
 function Ingredients() {
-  const [userIngredients, setUserIngredients] = useState(INITIAL_INGREDIENTS);
+  const [userIngredients, setUserIngredients] = useState([]);
+
+  useEffect(() => {
+    fetch(
+      "https://react-http-f6bc6-default-rtdb.asia-southeast1.firebasedatabase.app/ingredients.json"
+    )
+      .then((response) => {
+        return response.json();
+      })
+      .then((responseData) => {
+        const loadedIngredients = [];
+        for (const key in responseData) {
+          loadedIngredients.push({
+            id: key,
+            title: responseData[key].title,
+            amount: responseData[key].amount,
+          });
+        }
+        setUserIngredients(loadedIngredients);
+      });
+  }, []);
 
   const addIngredientHandler = (ingredient) => {
-    setUserIngredients((prevIngredients) => [
-      ...prevIngredients,
-      { id: Math.random().toString(), ...ingredient },
-    ]);
+    fetch(
+      "https://react-http-f6bc6-default-rtdb.asia-southeast1.firebasedatabase.app/ingredients.json",
+      {
+        method: "POST",
+        body: JSON.stringify(ingredient),
+        headers: { "Content-Type": "application/json" },
+      }
+    )
+      .then((response) => {
+        return response.json();
+      })
+      .then((responseData) => {
+        setUserIngredients((prevIngredients) => [
+          ...prevIngredients,
+          { id: responseData.name, ...ingredient },
+        ]);
+      });
   };
 
   const removeIngredientHandler = (ingredientId) => {
