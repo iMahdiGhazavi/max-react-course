@@ -48,6 +48,7 @@ function Ingredients() {
     dispatch({ type: "SET", ingredients: filteredIngredients });
   }, []);
 
+
   const addIngredientHandler = useCallback(
     (ingredient) => {
       sendRequest(
@@ -74,7 +75,6 @@ function Ingredients() {
     [sendRequest]
   );
 
-
   return (
     <div className="App">
       {error && <ErrorModal onClose={clear}>{error}</ErrorModal>}
@@ -86,10 +86,7 @@ function Ingredients() {
 
       <section>
         <Search onLoadIngredients={filteredIngredientsHandler} />
-        <IngredientList
-          ingredients={userIngredients}
-          onRemoveItem={removeIngredientHandler}
-        />
+        {ingredientList}
       </section>
     </div>
   );
