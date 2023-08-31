@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useCallback } from "react";
 
 import IngredientForm from "./IngredientForm";
 import IngredientList from "./IngredientList";
@@ -7,24 +7,8 @@ import Search from "./Search";
 function Ingredients() {
   const [userIngredients, setUserIngredients] = useState([]);
 
-  useEffect(() => {
-    fetch(
-      "https://react-http-f6bc6-default-rtdb.asia-southeast1.firebasedatabase.app/ingredients.json"
-    )
-      .then((response) => {
-        return response.json();
-      })
-      .then((responseData) => {
-        const loadedIngredients = [];
-        for (const key in responseData) {
-          loadedIngredients.push({
-            id: key,
-            title: responseData[key].title,
-            amount: responseData[key].amount,
-          });
-        }
-        setUserIngredients(loadedIngredients);
-      });
+  const filteredIngredientsHandler = useCallback((filteredIngredients) => {
+    setUserIngredients(filteredIngredients);
   }, []);
 
   const addIngredientHandler = (ingredient) => {
@@ -48,9 +32,16 @@ function Ingredients() {
   };
 
   const removeIngredientHandler = (ingredientId) => {
-    setUserIngredients((prevIngredients) =>
-      prevIngredients.filter((ingredient) => ingredient.id !== ingredientId)
-    );
+    fetch(
+      `https://react-http-f6bc6-default-rtdb.asia-southeast1.firebasedatabase.app/ingredients/${ingredientId}.json`,
+      {
+        method: "DELETE",
+      }
+    ).then((response) => {
+      setUserIngredients((prevIngredients) =>
+        prevIngredients.filter((ingredient) => ingredient.id !== ingredientId)
+      );
+    });
   };
 
   return (
@@ -58,7 +49,7 @@ function Ingredients() {
       <IngredientForm onAddIngredient={addIngredientHandler} />
 
       <section>
-        <Search />
+        <Search onLoadIngredients={filteredIngredientsHandler} />
         <IngredientList
           ingredients={userIngredients}
           onRemoveItem={removeIngredientHandler}
