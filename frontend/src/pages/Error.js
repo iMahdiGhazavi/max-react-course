@@ -4,13 +4,14 @@ import PageContent from "../components/PageContent";
 import MainNavigation from "../components/MainNavigation";
 
 const ErrorPage = () => {
-  const { error } = useRouteError();
+  const error = useRouteError();
+  console.log("the error is: ", error);
 
   let title = "An error occurred";
   let message = "Something went wrong.";
 
   if (error.status === 500) {
-    message = "Could not fetch events.";
+    message = error.data.message;
   }
 
   if (error.status === 404) {
