@@ -1,7 +1,7 @@
 import {
   Form,
-  useNavigation,
   useNavigate,
+  useNavigation,
   useActionData,
   json,
   redirect,
@@ -11,8 +11,8 @@ import classes from "./EventForm.module.css";
 
 function EventForm({ method, event }) {
   const data = useActionData();
-  const navigation = useNavigation();
   const navigate = useNavigate();
+  const navigation = useNavigation();
 
   const isSubmitting = navigation.state === "submitting";
 
@@ -24,8 +24,8 @@ function EventForm({ method, event }) {
     <Form method={method} className={classes.form}>
       {data && data.errors && (
         <ul>
-          {Object.keys(data.errors).map((key) => (
-            <li key={key}>{data.errors[key]}</li>
+          {Object.values(data.errors).map((err) => (
+            <li key={err}>{err}</li>
           ))}
         </ul>
       )}
@@ -36,7 +36,7 @@ function EventForm({ method, event }) {
           type="text"
           name="title"
           required
-          defaultValue={event?.title}
+          defaultValue={event ? event.title : ""}
         />
       </p>
       <p>
@@ -46,7 +46,7 @@ function EventForm({ method, event }) {
           type="url"
           name="image"
           required
-          defaultValue={event?.image}
+          defaultValue={event ? event.image : ""}
         />
       </p>
       <p>
@@ -56,7 +56,7 @@ function EventForm({ method, event }) {
           type="date"
           name="date"
           required
-          defaultValue={event?.date}
+          defaultValue={event ? event.date : ""}
         />
       </p>
       <p>
@@ -66,7 +66,7 @@ function EventForm({ method, event }) {
           name="description"
           rows="5"
           required
-          defaultValue={event?.description}
+          defaultValue={event ? event.description : ""}
         />
       </p>
       <div className={classes.actions}>
@@ -74,7 +74,7 @@ function EventForm({ method, event }) {
           Cancel
         </button>
         <button disabled={isSubmitting}>
-          {isSubmitting ? "Submitting..." : "Send"}
+          {isSubmitting ? "Submitting..." : "Save"}
         </button>
       </div>
     </Form>
@@ -83,7 +83,7 @@ function EventForm({ method, event }) {
 
 export default EventForm;
 
-export const action = async ({ request, params }) => {
+export async function action({ request, params }) {
   const method = request.method;
   const data = await request.formData();
 
@@ -97,23 +97,25 @@ export const action = async ({ request, params }) => {
   let url = "http://localhost:8080/events";
 
   if (method === "PATCH") {
-    url += `/${params.eventId}`;
+    const eventId = params.eventId;
+    url = "http://localhost:8080/events/" + eventId;
   }
 
   const response = await fetch(url, {
     method: method,
-    body: JSON.stringify(eventData),
     headers: {
       "Content-Type": "application/json",
     },
+    body: JSON.stringify(eventData),
   });
 
-  if (!response.ok) {
-    throw json(
-      { message: "Could not create the event. Please try again." },
-      { status: 500 }
-    );
-  } else {
-    return redirect("/events");
+  if (response.status === 422) {
+    return response;
   }
-};
+
+  if (!response.ok) {
+    throw json({ message: "Could not save event." }, { status: 500 });
+  }
+
+  return redirect("/events");
+}
