@@ -12,6 +12,10 @@ export const action = async ({ request }) => {
   const searchParams = new URL(request.url).searchParams;
   const mode = searchParams.get("mode") || "login";
 
+  if (mode !== "login" && mode !== "signup") {
+    throw json({ message: "Unsupported mode." }, { status: 422 });
+  }
+
   const data = await request.formData();
   const authData = {
     email: data.get("email"),
@@ -41,6 +45,7 @@ export const action = async ({ request }) => {
   const expiration = new Date();
   expiration.setHours(expiration.getHours() + 1);
   localStorage.setItem("expiration", expiration.toISOString());
-  
+  console.log("the token and expiration are: ", token, expiration);
+
   return redirect("/");
 };
